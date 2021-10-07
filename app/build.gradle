@@ -51,4 +51,9 @@ dependencies {
 
     // Coroutine ->
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1")
+
+//    // The core artifact.
+//    implementation 'com.github.fondesa:kpermissions:3.2.1'
+
+    implementation 'com.github.pankaj89:PermissionHelper:2.3'
 }
