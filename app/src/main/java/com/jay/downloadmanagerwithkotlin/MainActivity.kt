@@ -14,7 +14,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityMainBinding
 
-    private val url : String = "https://i.imgur.com/MnmF4Fb.mp4"
+    private val url : String = "https://i.imgur.com/ayo3pHA.mp4"
     private lateinit var downloaderViewModel : DownloaderViewModel
 
     private lateinit var permissionHelper : PermissionHelper
@@ -44,6 +44,14 @@ class MainActivity : AppCompatActivity() {
         downloaderViewModel.status.observe(this, {
             if(!it.isNullOrEmpty()) {
                 Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            }
+        })
+
+        downloaderViewModel.progress.observe(this, {
+            it?.let {
+                Log.d("Crying", "Progress is being set")
+                binding.progressBar.progress = it[0]
+                binding.progressBar.max = it[1]
             }
         })
     }

@@ -21,6 +21,10 @@ class DownloaderViewModel : ViewModel(){
     private val _status : MutableLiveData<String> = MutableLiveData()
     val status : LiveData<String> = _status
 
+    // LiveData for progress
+    private val _progress : MutableLiveData<List<Int>> = MutableLiveData()
+    val progress : LiveData<List<Int>> = _progress
+
     // This is just to keep track of statuses when the download is running
     private var lastMsg : String = ""
 
@@ -103,9 +107,20 @@ class DownloaderViewModel : ViewModel(){
                 while (downloading) {
                     val cursor: Cursor = downloadManager.query(query)
                     cursor.moveToFirst()
+                    val total : Long = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+                    // Progress ->
+                    if (total >= 0) {
+                        val downloaded : Long = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+                        val currentProgress: Int = downloaded.toInt()
+                        _progress.postValue(listOf(currentProgress, total.toInt()))
+                    }
+
+                    // Download finished
                     if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
                         downloading = false
                     }
+
+                    // Changing statuses ->
                     val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
                     val msg = statusMessage(url, directory, status)
                     if (msg != lastMsg) {
@@ -116,6 +131,7 @@ class DownloaderViewModel : ViewModel(){
                 }
             } catch (e: CursorIndexOutOfBoundsException) {
                 _status.postValue("Download cancelled")
+                _progress.postValue(listOf(0, 0))
             }
         }
     }
